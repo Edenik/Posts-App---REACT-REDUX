@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+import {connect} from 'react-redux';
+import { createPost } from '../actions/postActions'
 
-const API_URL = `https://jsonplaceholder.typicode.com/posts`;
-
-function PostForm() {
+function PostForm(props) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -22,15 +23,7 @@ function PostForm() {
       body,
     };
 
-    fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(post),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
+    props.createPost(post);
   }
 
   return (
@@ -63,4 +56,8 @@ function PostForm() {
   );
 }
 
-export default PostForm;
+PostForm.propTypes = {
+  createPost : PropTypes.func.isRequired
+}
+
+export default connect(null, {createPost})(PostForm);

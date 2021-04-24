@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { Component,  } from "react";
+import PropTypes from "prop-types";
+import {connect} from 'react-redux';
+import {fetchPosts} from '../actions/postActions'
 
-const API_URL = `https://jsonplaceholder.typicode.com/posts`;
 
-function Posts() {
-  const [posts, setPosts] = useState([]);
+class Posts extends Component {
+  componentDidMount(){
+    this.props.fetchPosts();
+  }
 
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setPosts(data));
-    console.log("hello");
-  }, []);
-  const postItems = posts.map((post) => (
+  componentWillReceiveProps(nextProps){
+    if(nextProps.newPost){
+      this.props.posts.unshift(nextProps.newPost)
+    }
+  }
+
+ render(){
+  const postItems = this.props.posts.map((post) => (
     <div key={post.id}>
-      <h3>{post.title}</h3>
+      <h3>
+        #{post.id}. {post.title}
+      </h3>
       <p>{post.body}</p>
     </div>
   ));
@@ -25,6 +32,18 @@ function Posts() {
       {postItems}
     </div>
   );
+ }
 }
 
-export default Posts;
+Posts.propTypes = {
+  fetchPosts: PropTypes.func.isRequired,
+  posts: PropTypes.array.isRequired,
+  newPost: PropTypes.object
+}
+
+const mapStateToProps = state => ({
+  posts: state.posts.items,
+  newPost: state.posts.item
+})
+
+export default connect(mapStateToProps, {fetchPosts})(Posts);
